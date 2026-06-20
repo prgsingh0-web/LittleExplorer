@@ -1,0 +1,125 @@
+@page "/memories"
+@rendermode InteractiveServer
+
+@using ToddlerActivityPlanner.Models
+@using Microsoft.AspNetCore.Components.Forms
+@inject ToddlerActivityPlanner.Services.MemoryService MemoryService
+@inject ToddlerActivityPlanner.Services.ChildService ChildService
+
+<h1>📸 Memory Gallery</h1>
+
+@if (activeChild == null)
+{
+    <div class="alert alert-warning">
+        Please select a child first.
+    </div>
+}
+else
+{
+    <div class="active-child-banner">
+        👶 Memories for <strong>@activeChild.Name</strong>
+    </div>
+
+    <input class="form-control" @bind="newMemory.Title" placeholder="Memory Title" />
+    <br />
+
+    <input class="form-control" @bind="newMemory.Notes" placeholder="Notes" />
+    <br />
+
+    <input class="form-control" type="date" @bind="newMemory.MemoryDate" />
+    <br />
+
+    <InputFile OnChange="UploadPhoto" />
+<br />
+
+    <button class="btn btn-primary" @onclick="AddMemory">
+        Add Memory
+    </button>
+
+    <hr />
+
+   @foreach (var memory in memories)
+{
+    <div class="dashboard-card">
+
+        @if (!string.IsNullOrWhiteSpace(memory.PhotoPath))
+        {
+            <img src="@memory.PhotoPath" class="memory-photo" />
+        }
+
+        <h3>📸 @memory.Title</h3>
+        <p>@memory.Notes</p>
+        <small>@memory.MemoryDate.ToShortDateString()</small>
+
+        <br /><br />
+
+        <button class="btn btn-danger btn-sm"
+                @onclick="() => Delete(memory.Id)">
+            Delete
+        </button>
+
+    </div>
+}
+}
+
+@code {
+    private Child? activeChild;
+    private List<Memory> memories = new();
+    private Memory newMemory = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        activeChild = (await ChildService.GetAllAsync())
+            .FirstOrDefault(c => c.IsActive);
+
+        await LoadMemories();
+    }
+
+    private async Task LoadMemories()
+    {
+        if (activeChild == null)
+        {
+            memories = new();
+            return;
+        }
+
+        memories = await MemoryService.GetAllAsync(activeChild.Id);
+    }
+
+    private async Task AddMemory()
+    {
+        if (activeChild == null || string.IsNullOrWhiteSpace(newMemory.Title))
+        {
+            return;
+        }
+
+        newMemory.ChildId = activeChild.Id;
+
+        await MemoryService.AddAsync(newMemory);
+
+        newMemory = new Memory();
+        await LoadMemories();
+    }
+
+    private async Task Delete(int id)
+    {
+        await MemoryService.DeleteAsync(id);
+        await LoadMemories();
+    }
+    private async Task UploadPhoto(InputFileChangeEventArgs e)
+{
+    var file = e.File;
+
+    var fileName = $"{Guid.NewGuid()}_{file.Name}";
+    var folderPath = Path.Combine("wwwroot", "memories");
+
+    Directory.CreateDirectory(folderPath);
+
+    var filePath = Path.Combine(folderPath, fileName);
+
+    await using var stream = File.Create(filePath);
+    await file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(stream);
+
+    newMemory.PhotoPath = $"/memories/{fileName}";
+}
+}

@@ -1,0 +1,87 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = ToddlerActivityPlanner
+build_property.RootNamespace = ToddlerActivityPlanner
+build_property.ProjectDir = /Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner
+build_property._RazorSourceGeneratorDebug = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/App.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BcHAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Pages/Activities.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9BY3Rpdml0aWVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Pages/Children.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9DaGlsZHJlbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Db3VudGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Pages/Dashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9EYXNoYm9hcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Pages/Error.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9FcnJvci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Pages/Growth.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Hcm93dGgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Ib21lLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Pages/Meals.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9NZWFscy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Pages/Memories.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9NZW1vcmllcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Pages/Sleep.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9TbGVlcC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Pages/Water.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9XYXRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Pages/Weather.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9XZWF0aGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Routes.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Sb3V0ZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9fSW1wb3J0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvTWFpbkxheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-mukifml3jt
+
+[/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/Components/Layout/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvTmF2TWVudS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-1qprldvd8k

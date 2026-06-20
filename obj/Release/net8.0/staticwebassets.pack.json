@@ -1,0 +1,49 @@
+{
+  "Files": [
+    {
+      "Id": "/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/obj/Release/net8.0/scopedcss/projectbundle/ToddlerActivityPlanner.bundle.scp.css",
+      "PackagePath": "staticwebassets/ToddlerActivityPlanner.bundle.scp.css"
+    },
+    {
+      "Id": "/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/wwwroot/app.css",
+      "PackagePath": "staticwebassets/app.css"
+    },
+    {
+      "Id": "/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/wwwroot/bootstrap/bootstrap.min.css",
+      "PackagePath": "staticwebassets/bootstrap/bootstrap.min.css"
+    },
+    {
+      "Id": "/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/wwwroot/bootstrap/bootstrap.min.css.map",
+      "PackagePath": "staticwebassets/bootstrap/bootstrap.min.css.map"
+    },
+    {
+      "Id": "/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/wwwroot/favicon.png",
+      "PackagePath": "staticwebassets/favicon.png"
+    },
+    {
+      "Id": "/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/wwwroot/images/baby.jpeg",
+      "PackagePath": "staticwebassets/images/baby.jpeg"
+    },
+    {
+      "Id": "/Users/pragyasingh/ToddlerActivityPlanner/ToddlerActivityPlanner/wwwroot/memories/3d2a8241-9042-4bbe-a74c-3a06bbb07446_FullSizeRender.jpeg",
+      "PackagePath": "staticwebassets/memories/3d2a8241-9042-4bbe-a74c-3a06bbb07446_FullSizeRender.jpeg"
+    },
+    {
+      "Id": "obj/Release/net8.0/staticwebassets/msbuild.ToddlerActivityPlanner.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Release/net8.0/staticwebassets/msbuild.build.ToddlerActivityPlanner.props",
+      "PackagePath": "build\\ToddlerActivityPlanner.props"
+    },
+    {
+      "Id": "obj/Release/net8.0/staticwebassets/msbuild.buildMultiTargeting.ToddlerActivityPlanner.props",
+      "PackagePath": "buildMultiTargeting\\ToddlerActivityPlanner.props"
+    },
+    {
+      "Id": "obj/Release/net8.0/staticwebassets/msbuild.buildTransitive.ToddlerActivityPlanner.props",
+      "PackagePath": "buildTransitive\\ToddlerActivityPlanner.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

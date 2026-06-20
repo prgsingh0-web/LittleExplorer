@@ -1,0 +1,135 @@
+@page "/meals"
+@rendermode InteractiveServer
+
+@using ToddlerActivityPlanner.Models
+@inject ToddlerActivityPlanner.Services.MealService MealService
+
+@inject ToddlerActivityPlanner.Services.ChildService ChildService 
+
+<div class="meal-header">
+    <h1>🍽️ Toddler Meal Planner</h1>
+    <p>Track your toddler's meals, snacks and nutrition throughout the day.</p>
+</div>
+
+<input class="form-control" @bind="newMeal.FoodName" placeholder="Food Name" />
+<br />
+
+<select class="form-control" @bind="newMeal.MealType">
+    <option>Breakfast</option>
+    <option>Lunch</option>
+    <option>Snack</option>
+    <option>Dinner</option>
+</select>
+<br />
+
+<input class="form-control" @bind="newMeal.Notes" placeholder="Notes" />
+<br />
+
+<button class="btn btn-primary" @onclick="AddMeal">
+    Add Meal
+</button>
+
+<hr />
+
+@if (meals.Count == 0)
+{
+    <p>No meals added yet.</p>
+}
+else
+{
+    @foreach (var meal in meals)
+    {
+        <div class="meal-card">
+            <div>
+                <b>@GetMealIcon(meal.MealType) @meal.MealType</b>
+                <p>@meal.FoodName</p>
+                <small>@meal.Notes</small>
+            </div>
+
+            <div>
+                <button class="btn btn-success btn-sm" @onclick="() => Toggle(meal.Id)">
+                    @(meal.IsEaten ? "Undo" : "Eaten")
+                </button>
+
+                <button class="btn btn-danger btn-sm" @onclick="() => Delete(meal.Id)">
+                    Delete
+                </button>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    private List<Meal> meals = new();
+
+    private Child? activeChild;
+
+    private Meal newMeal = new()
+    {
+        MealType = "Breakfast"
+    };
+
+    protected override async Task OnInitializedAsync()
+{
+    activeChild = (await ChildService.GetAllAsync())
+        .FirstOrDefault(c => c.IsActive);
+
+    await LoadMeals();
+}
+
+    private async Task LoadMeals()
+{
+    if (activeChild == null)
+    {
+        meals = new();
+        return;
+    }
+
+    meals = await MealService.GetAllAsync(activeChild.Id);
+}
+
+    private async Task AddMeal()
+    {
+        if (!string.IsNullOrWhiteSpace(newMeal.FoodName))
+        {   
+            if (activeChild == null)
+           {
+             return;
+          }
+
+            newMeal.ChildId = activeChild.Id;
+            await MealService.AddAsync(newMeal);
+
+            newMeal = new Meal
+            {
+                MealType = "Breakfast"
+            };
+
+            await LoadMeals();
+        }
+    }
+
+    private async Task Toggle(int id)
+    {
+        await MealService.ToggleEatenAsync(id);
+        await LoadMeals();
+    }
+
+    private async Task Delete(int id)
+    {
+        await MealService.DeleteAsync(id);
+        await LoadMeals();
+    }
+
+    private string GetMealIcon(string mealType)
+    {
+        return mealType switch
+        {
+            "Breakfast" => "🍌",
+            "Lunch" => "🍚",
+            "Snack" => "🍎",
+            "Dinner" => "🥣",
+            _ => "🍽️"
+        };
+    }
+}

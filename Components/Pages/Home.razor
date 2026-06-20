@@ -1,0 +1,49 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+@using ToddlerActivityPlanner.Models
+@inject ToddlerActivityPlanner.Services.ChildService ChildService
+
+<PageTitle>Little Explorer</PageTitle>
+
+<div class="home-hero">
+    <div>
+        @if (activeChild != null)
+        {
+            <h1>👶 Welcome back, @activeChild.Name!</h1>
+            <h3>@activeChild.Age years old • Little Explorer</h3>
+        }
+        else
+        {
+            <h1>🌟 Welcome to Little Explorer</h1>
+            <h3>Toddler Wellness Planner</h3>
+            <p>Please add a child profile to get started.</p>
+        }
+
+        <p>
+            Track activities, meals, sleep and water intake in one simple app.
+        </p>
+
+        <a class="btn btn-primary btn-lg" href="/children">Child Profile</a>
+        <a class="btn btn-outline-primary btn-lg ms-2" href="/dashboard">View Dashboard</a>
+    </div>
+
+    <img src="/images/baby.jpeg" class="home-baby" />
+</div>
+
+<div class="home-grid">
+    <div class="home-card">📋<h4>Activities</h4><p>Track daily learning and play.</p></div>
+    <div class="home-card">🍽️<h4>Meals</h4><p>Plan meals and snacks.</p></div>
+    <div class="home-card">😴<h4>Sleep</h4><p>Monitor bedtime and wake-up.</p></div>
+    <div class="home-card">💧<h4>Water</h4><p>Track daily hydration.</p></div>
+</div>
+
+@code {
+    private Child? activeChild;
+
+    protected override async Task OnInitializedAsync()
+    {
+        activeChild = (await ChildService.GetAllAsync())
+            .FirstOrDefault(c => c.IsActive);
+    }
+}

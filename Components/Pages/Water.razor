@@ -1,0 +1,83 @@
+@page "/water"
+@rendermode InteractiveServer
+
+@using ToddlerActivityPlanner.Models
+@inject ToddlerActivityPlanner.Services.WaterService WaterService
+
+@inject ToddlerActivityPlanner.Services.ChildService ChildService
+
+
+<div class="dashboard-card water-card">
+    <h1>💧 Water Tracker</h1>
+    <p>Track daily water intake and stay hydrated.</p>
+</div>
+
+<br />
+
+<p>Today's Goal: 5 cups</p>
+
+<input class="form-control" type="number" @bind="cups" />
+<br />
+
+<button class="btn btn-primary" @onclick="AddWater">
+    Add Cups
+</button>
+
+<hr />
+
+<h3>Total Cups: @TotalCups / 5</h3>
+
+<div class="progress">
+    <div class="progress-bar" style="width:@ProgressPercent%">
+        @ProgressPercent%
+    </div>
+</div>
+
+@code {
+    private int cups = 1;
+    private Child? activeChild;
+    private List<WaterRecord> records = new();
+
+    private int TotalCups => records.Sum(x => x.CupsDrank);
+    private int ProgressPercent => TotalCups >= 5 ? 100 : TotalCups * 100 / 5;
+
+    protected override async Task OnInitializedAsync()
+{
+    activeChild = (await ChildService.GetAllAsync())
+        .FirstOrDefault(c => c.IsActive);
+
+    await LoadWaterRecords();
+}
+
+    private async Task AddWater()
+    {   
+        if (activeChild == null)
+{
+    return;
+}
+
+await WaterService.AddAsync(new WaterRecord
+{
+    CupsDrank = cups,
+    ChildId = activeChild.Id,
+    Date = DateTime.Today
+});
+        await WaterService.AddAsync(new WaterRecord
+        {
+            CupsDrank = cups,
+            Date = DateTime.Today
+        });
+
+        await LoadWaterRecords();
+    }
+    private async Task LoadWaterRecords()
+{
+    if (activeChild == null)
+    {
+        records = new();
+        return;
+    }
+
+    records = await WaterService.GetAllAsync(activeChild.Id);
+}
+}

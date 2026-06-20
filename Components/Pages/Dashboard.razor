@@ -1,0 +1,110 @@
+@page "/dashboard"
+@rendermode InteractiveServer
+
+
+@using ToddlerActivityPlanner.Models
+@inject ToddlerActivityPlanner.Services.ActivityService ActivityService
+@inject ToddlerActivityPlanner.Services.MealService MealService
+@inject ToddlerActivityPlanner.Services.SleepService SleepService
+@inject ToddlerActivityPlanner.Services.WaterService WaterService
+@inject ToddlerActivityPlanner.Services.ChildService ChildService
+
+@inject ToddlerActivityPlanner.Services.GrowthService GrowthService
+
+@if (activeChild != null)
+{
+    <div class="active-child-banner">
+        👶 Active Child:
+        <strong>@activeChild.Name</strong>
+        (@activeChild.Age years)
+    </div>
+}
+else
+{
+    <div class="active-child-banner">
+        👶 No active child selected
+    </div>
+}
+
+<div class="dashboard-hero">
+    <h1>🌟 Good Evening, Pragya</h1>
+    <p>Here's your little explorer's progress today!</p>
+    <img src="/images/baby.jpeg" class="dashboard-avatar" />
+</div>
+
+<div class="dashboard-grid">
+    <div class="dashboard-card activities-card">
+    <h3>📋 Activities</h3>
+    <h2>@ActivityCount</h2>
+</div>
+
+<div class="dashboard-card meals-card">
+    <h3>🍽 Meals</h3>
+    <h2>@MealCount</h2>
+</div>
+
+<div class="dashboard-card sleep-card-dashboard">
+    <h3>😴 Sleep</h3>
+    <h2>@SleepCount</h2>
+</div>
+
+<div class="dashboard-card water-card">
+    <h3>💧 Water</h3>
+    <h2>@WaterCups / 5</h2>
+</div>
+
+<div class="dashboard-card growth-card">
+    <h3>📈 Growth</h3>
+
+    @if (LatestGrowth != null)
+    {
+        <h2>@LatestGrowth.WeightKg kg</h2>
+        <p>@LatestGrowth.HeightCm cm</p>
+    }
+    else
+    {
+        <h2>-</h2>
+        <p>No record</p>
+    }
+</div>
+</div>
+
+<div class="reward-card">
+    <h2>🏆 Rewards</h2>
+    <h3>⭐ Stars Earned: @ActivityCount</h3>
+    <p>Keep tracking activities, meals, sleep and water to earn more stars!</p>
+</div>
+
+
+@code {
+    private int ActivityCount;
+    private int MealCount;
+    private int SleepCount;
+    private int WaterCups;
+    private Child? activeChild;
+
+    private GrowthRecord? LatestGrowth;
+
+    protected override async Task OnInitializedAsync()
+{
+    activeChild = (await ChildService.GetAllAsync())
+                    .FirstOrDefault(c => c.IsActive);
+
+    LatestGrowth = activeChild == null
+    ? null
+    : (await GrowthService.GetAllAsync(activeChild.Id)).FirstOrDefault();
+
+    ActivityCount = activeChild == null
+    ? 0
+    : (await ActivityService.GetAllAsync(activeChild.Id)).Count;
+    MealCount = activeChild == null
+    ? 0
+    : (await MealService.GetAllAsync(activeChild.Id)).Count;
+   SleepCount = activeChild == null
+    ? 0
+    : (await SleepService.GetAllAsync(activeChild.Id)).Count;
+   WaterCups = activeChild == null
+    ? 0
+    : (await WaterService.GetAllAsync(activeChild.Id)).Sum(x => x.CupsDrank);
+    }
+}

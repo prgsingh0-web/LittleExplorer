@@ -1,0 +1,181 @@
+@page "/activities"
+@rendermode InteractiveServer
+
+@using ToddlerActivityPlanner.Models
+@inject ToddlerActivityPlanner.Services.ActivityService ActivityService
+
+@inject ToddlerActivityPlanner.Services.ChildService ChildService
+
+<h1>🎯 Toddler Activity Planner</h1>
+
+<div class="hero-card">
+    <img src="/images/baby.jpeg" class="baby-avatar" />
+
+    <div class="hero-content">
+        <h2>🌟 My Little Explorer</h2>
+        <p>Plan learning, reading, outdoor play and fun activities for today.</p>
+    </div>
+</div>
+
+<div class="progress-section">
+    <div class="stars-card">
+    <h4>🏆 Achievement Stars</h4>
+    <p class="stars">@AchievementStars</p>
+
+    <small>
+        Complete more activities to earn more stars!
+    </small>
+</div>
+    <h4>Today's Progress</h4>
+    <div class="progress">
+        <div class="progress-bar" style="width:@ProgressPercent%">
+            @ProgressPercent%
+        </div>
+    </div>
+    <p>@CompletedCount of @TotalCount activities completed</p>
+</div>
+
+<input class="form-control" @bind="newActivity.Name" placeholder="Activity Name" />
+<br />
+
+<select class="form-control" @bind="newActivity.Category">
+    <option>Learning</option>
+    <option>Reading</option>
+    <option>Outdoor</option>
+    <option>Art</option>
+    <option>Music</option>
+</select>
+<br />
+
+<input class="form-control" type="number" @bind="newActivity.DurationMinutes" />
+<br />
+
+<button class="btn btn-primary" @onclick="AddActivity">Add Activity</button>
+
+<hr />
+
+@if (activities.Count == 0)
+{
+    <p>No activities added yet.</p>
+}
+else
+{
+    <div class="activity-list">
+        @foreach (var activity in activities)
+        {
+            <div class="activity-card">
+                <div>
+                    <b>@activity.Name</b>
+                    <p>
+    <span class="category-badge">
+        @GetCategoryIcon(activity.Category) @activity.Category
+    </span>
+    <span>@activity.DurationMinutes min</span>
+</p>
+                </div>
+
+                <div>
+                    <button class="btn btn-success btn-sm" @onclick="() => Toggle(activity.Id)">
+                        @(activity.IsCompleted ? "Undo" : "Done")
+                    </button>
+
+                    <button class="btn btn-danger btn-sm" @onclick="() => Delete(activity.Id)">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<Activity> activities = new();
+    private Child? activeChild;
+
+    private Activity newActivity = new()
+    {
+        Category = "Learning",
+        DurationMinutes = 15
+    };
+
+    private int TotalCount => activities.Count;
+    private int CompletedCount => activities.Count(x => x.IsCompleted);
+    private int ProgressPercent => TotalCount == 0 ? 0 : CompletedCount * 100 / TotalCount;
+
+    protected override async Task OnInitializedAsync()
+{
+    activeChild = (await ChildService.GetAllAsync())
+        .FirstOrDefault(c => c.IsActive);
+
+    await LoadActivities();
+}
+
+    private async Task LoadActivities()
+{
+    if (activeChild == null)
+    {
+        activities = new();
+        return;
+    }
+
+    activities = await ActivityService.GetAllAsync(activeChild.Id);
+}
+
+    private async Task AddActivity()
+{
+    if (!string.IsNullOrWhiteSpace(newActivity.Name))
+    {
+        if (activeChild == null)
+        {
+            return;
+        }
+
+        newActivity.ChildId = activeChild.Id;
+
+        await ActivityService.AddAsync(newActivity);
+
+        newActivity = new Activity
+        {
+            Category = "Learning",
+            DurationMinutes = 15
+        };
+
+        await LoadActivities();
+    }
+}
+
+    private async Task Toggle(int id)
+    {
+        await ActivityService.ToggleCompleteAsync(id);
+        await LoadActivities();
+    }
+
+    private async Task Delete(int id)
+    {
+        await ActivityService.DeleteAsync(id);
+        await LoadActivities();
+    }
+    private string AchievementStars
+{
+    get
+    {
+        if (CompletedCount >= 5) return "⭐⭐⭐⭐⭐";
+        if (CompletedCount >= 3) return "⭐⭐⭐";
+        if (CompletedCount >= 1) return "⭐";
+        return "No stars yet";
+    }
+}
+
+private string GetCategoryIcon(string category)
+{
+    return category switch
+    {
+        "Reading" => "📚",
+        "Outdoor" => "⚽",
+        "Art" => "🎨",
+        "Music" => "🎵",
+        "Learning" => "🧠",
+        _ => "🌟"
+    };
+}
+}

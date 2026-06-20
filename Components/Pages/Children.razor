@@ -1,0 +1,111 @@
+@page "/children"
+@rendermode InteractiveServer
+
+@using ToddlerActivityPlanner.Models
+@inject ToddlerActivityPlanner.Services.ChildService ChildService
+
+<h1>👶 Child Profile</h1>
+
+<label>Child Name</label>
+<input class="form-control" @bind="newChild.Name" placeholder="Enter child name" />
+
+<br />
+
+<label>Age</label>
+<input class="form-control" type="number" @bind="newChild.Age" placeholder="Enter age" />
+
+<br />
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
+
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
+
+<button class="btn btn-primary" @onclick="AddChild">
+    Add Child
+</button>
+
+<hr />
+
+@foreach (var child in children)
+{
+    <div class="dashboard-card">
+    <h3>👶 @child.Name</h3>
+<p>Age: @child.Age years</p>
+
+@if (child.IsActive)
+{
+    <span class="badge bg-success">⭐ Active Child</span>
+}
+else
+{
+    <button class="btn btn-outline-primary btn-sm"
+            @onclick="() => SetActive(child.Id)">
+        Select
+    </button>
+}
+
+    <button class="btn btn-danger btn-sm"
+            @onclick="() => DeleteChild(child.Id)">
+        Delete
+    </button>
+</div>
+}
+
+@code {
+    private List<Child> children = new();
+    private Child newChild = new();
+    private string errorMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        children = await ChildService.GetAllAsync();
+    }
+
+   private async Task AddChild()
+{
+    errorMessage = "";
+
+    if (string.IsNullOrWhiteSpace(newChild.Name))
+    {
+        errorMessage = "Please enter child name.";
+        return;
+    }
+
+    if (!newChild.Age.HasValue || newChild.Age <= 0)
+    {
+        errorMessage = "Please enter valid age.";
+        return;
+    }
+
+    await ChildService.AddAsync(newChild);
+    newChild = new Child();
+    children = await ChildService.GetAllAsync();
+}    private async Task DeleteChild(int id)
+{
+    await ChildService.DeleteAsync(id);
+    children = await ChildService.GetAllAsync();
+}
+private async Task SetActive(int id)
+{
+    await ChildService.SetActiveAsync(id);
+    children = await ChildService.GetAllAsync();
+}
+}

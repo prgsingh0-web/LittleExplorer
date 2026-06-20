@@ -1,0 +1,107 @@
+@page "/sleep"
+@rendermode InteractiveServer
+
+@using ToddlerActivityPlanner.Models
+@inject ToddlerActivityPlanner.Services.SleepService SleepService
+
+@inject ToddlerActivityPlanner.Services.ChildService ChildService
+
+<div class="alert alert-info">
+    👶 Tracking for: <strong>@activeChild?.Name</strong>
+</div>
+
+ <div class="sleep-header">
+    <h1>😴 Sleep Tracker</h1>
+    <p>Track bedtime, wake-up time and total sleep hours.</p>
+</div>
+
+<input class="form-control" type="datetime-local" @bind="newRecord.BedTime" />
+<br />
+
+<input class="form-control" type="datetime-local" @bind="newRecord.WakeTime" />
+<br />
+
+<input class="form-control" @bind="newRecord.Notes" placeholder="Notes" />
+<br />
+
+<button class="btn btn-primary" @onclick="AddSleep">
+    Add Sleep Record
+</button>
+
+<hr />
+
+@foreach (var record in sleepRecords)
+{
+    <div class="sleep-card">
+        <b>😴 Sleep</b>
+        <p>Bed: @record.BedTime</p>
+        <p>Wake: @record.WakeTime</p>
+        <p>Total: @GetSleepHours(record)</p>
+        <small>@record.Notes</small>
+
+        <br />
+        <button class="btn btn-danger btn-sm" @onclick="() => Delete(record.Id)">
+            Delete
+        </button>
+    </div>
+}
+
+@code {
+    private List<SleepRecord> sleepRecords = new();
+
+    private Child? activeChild;
+
+    private SleepRecord newRecord = new()
+    {
+        BedTime = DateTime.Now.Date.AddHours(21),
+        WakeTime = DateTime.Now.Date.AddDays(1).AddHours(7)
+    };
+protected override async Task OnInitializedAsync()
+{
+    activeChild = (await ChildService.GetAllAsync())
+        .FirstOrDefault(c => c.IsActive);
+
+    await LoadSleepRecords();
+}
+
+private async Task LoadSleepRecords()
+{
+    if (activeChild == null)
+    {
+        sleepRecords = new();
+        return;
+    }
+
+    sleepRecords = await SleepService.GetAllAsync(activeChild.Id);
+}
+    private async Task AddSleep()
+    {
+        if (activeChild == null)
+       {
+         return;
+        }
+
+        newRecord.ChildId = activeChild.Id;
+        await SleepService.AddAsync(newRecord);
+
+        newRecord = new SleepRecord
+        {
+            BedTime = DateTime.Now.Date.AddHours(21),
+            WakeTime = DateTime.Now.Date.AddDays(1).AddHours(7)
+        };
+
+        await LoadSleepRecords();
+    }
+
+    private async Task Delete(int id)
+    {
+        await SleepService.DeleteAsync(id);
+        await LoadSleepRecords();
+    }
+
+    private string GetSleepHours(SleepRecord record)
+    {
+        var duration = record.WakeTime - record.BedTime;
+        return $"{duration.Hours}h {duration.Minutes}m";
+    }
+}
