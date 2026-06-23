@@ -1,0 +1,64 @@
+@page "/ai-assistant"
+@rendermode InteractiveServer
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+
+<h1>🤖 AI Parenting Assistant</h1>
+
+<div class="dashboard-card ai-card">
+    <h3>Ask Little Explorer AI</h3>
+
+    <textarea class="form-control"
+              rows="4"
+              @bind="question"
+              placeholder="Example: Suggest activities for my 3 year old"></textarea>
+
+    <br />
+
+    <button class="btn btn-primary" type="button" @onclick="AskAI">
+        Ask AI
+    </button>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(answer))
+{
+    <div class="dashboard-card ai-answer-card">
+        <h3>✨ AI Suggestion</h3>
+        <p>@answer</p>
+    </div>
+}
+
+@code {
+    private string question = "";
+    private string answer = "";
+
+   private Task AskAI()
+{
+    if (string.IsNullOrWhiteSpace(question))
+    {
+        answer = "Please type a question first.";
+        return Task.CompletedTask;
+    }
+
+    var q = question.ToLower();
+
+    if (q.Contains("meal") || q.Contains("food") || q.Contains("veg"))
+    {
+        answer = "For a 2-year-old vegetarian child, you can try: vegetable khichdi, dal rice with ghee, paneer paratha, suji upma, idli with sambar, curd rice, fruit yogurt bowl, besan chilla, and soft roti with dal. Keep food soft, mildly spiced, and cut into small pieces.";
+    }
+    else if (q.Contains("activity") || q.Contains("play"))
+    {
+        answer = "Try color sorting, building blocks, pretend cooking, simple puzzles, sticker activity, story time, water play, and outdoor ball play for 15–20 minutes.";
+    }
+    else if (q.Contains("sleep") || q.Contains("nap"))
+    {
+        answer = "For better sleep, keep a fixed bedtime, reduce screen time before sleep, use a calm story routine, dim lights, and keep nap timing consistent.";
+    }
+    else
+    {
+        answer = "I can help with toddler meals, activities, sleep routines, water tracking, and growth ideas. Try asking: 'Suggest meals for my 2-year-old vegetarian child'.";
+    }
+
+    return Task.CompletedTask;
+}
+}

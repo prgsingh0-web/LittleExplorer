@@ -20,6 +20,14 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/login";
+    options.LogoutPath = "/logout";
+    options.AccessDeniedPath = "/login";
+});
+
 builder.Services.AddRazorPages(); 
 
 
@@ -79,6 +87,14 @@ app.MapPost("/login-user", async (
     }
 
     return Results.Redirect("/login?error=1");
+});
+
+app.MapPost("/logout-user", async (
+    HttpContext httpContext,
+    SignInManager<ApplicationUser> signInManager) =>
+{
+    await signInManager.SignOutAsync();
+    return Results.Redirect("/login");
 });
 
 app.Run();

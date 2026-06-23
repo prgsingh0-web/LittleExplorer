@@ -813,3 +813,23 @@ h1:focus {
     opacity: 0.9;
 }
 
+
+.ai-card {
+    background: #f5f3ff !important;
+    border-left: 6px solid #8b5cf6 !important;
+}
+
+.ai-card h3 {
+    color: #6d28d9 !important;
+}
+
+.ai-answer-card {
+    background: #ecfdf5 !important;
+    border-left: 6px solid #22c55e !important;
+    margin-top: 20px;
+}
+
+.ai-answer-card h3 {
+    color: #15803d !important;
+}
+

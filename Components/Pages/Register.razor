@@ -6,7 +6,13 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager Navigation
 
-<h1>🔐 Register</h1>
+<h1>📝 Register Parent</h1>
+
+<input class="form-control" @bind="parentName" placeholder="Parent Name" />
+<br />
+
+<input class="form-control" @bind="phoneNumber" placeholder="Phone Number" />
+<br />
 
 <input class="form-control" @bind="email" placeholder="Email" />
 <br />
@@ -18,10 +24,12 @@
 
 @if (!string.IsNullOrWhiteSpace(message))
 {
-    <p>@message</p>
+    <p class="text-danger">@message</p>
 }
 
 @code {
+    private string parentName = "";
+    private string phoneNumber = "";
     private string email = "";
     private string password = "";
     private string message = "";
@@ -31,14 +39,16 @@
         var user = new ApplicationUser
         {
             UserName = email,
-            Email = email
+            Email = email,
+            ParentName = parentName,
+            PhoneNumber = phoneNumber
         };
 
         var result = await UserManager.CreateAsync(user, password);
 
         if (result.Succeeded)
         {
-           Navigation.NavigateTo("/login", forceLoad: true);
+            Navigation.NavigateTo("/login", forceLoad: true);
         }
         else
         {
