@@ -2,6 +2,12 @@
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using ToddlerActivityPlanner.Models
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
 
 
 @using ToddlerActivityPlanner.Models
@@ -29,7 +35,7 @@ else
 }
 
 <div class="dashboard-hero">
-    <h1>🌟 Good Evening, Pragya</h1>
+    <h1>🌟 Good Evening, @displayName</h1>
     <p>Here's your little explorer's progress today!</p>
     <img src="/images/baby.jpeg" class="dashboard-avatar" />
 </div>
@@ -85,10 +91,23 @@ else
     private int WaterCups;
     private Child? activeChild;
 
+    private string displayName = "Parent";
+
     private GrowthRecord? LatestGrowth;
 
     protected override async Task OnInitializedAsync()
 {
+    var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    var user = authState.User;
+
+    if (user.Identity?.IsAuthenticated == true)
+    {
+        var appUser = await UserManager.GetUserAsync(user);
+        if (appUser != null)
+        {
+            displayName = appUser.ParentName;
+        }
+    }
     activeChild = (await ChildService.GetAllAsync())
                     .FirstOrDefault(c => c.IsActive);
 
