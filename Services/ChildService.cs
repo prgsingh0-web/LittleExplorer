@@ -13,6 +13,14 @@ public class ChildService
         _db = db;
     }
 
+    public async Task<List<Child>> GetAllAsync(string userId)
+    {
+        return await _db.Children
+            .Where(c => c.UserId == userId)
+            .OrderByDescending(c => c.CreatedDate)
+            .ToListAsync();
+    }
+
     public async Task<List<Child>> GetAllAsync()
     {
         return await _db.Children
@@ -36,15 +44,18 @@ public class ChildService
             await _db.SaveChangesAsync();
         }
     }
-    public async Task SetActiveAsync(int childId)
-{
-    var children = await _db.Children.ToListAsync();
 
-    foreach (var child in children)
+    public async Task SetActiveAsync(int childId, string userId)
     {
-        child.IsActive = child.Id == childId;
-    }
+        var children = await _db.Children
+            .Where(c => c.UserId == userId)
+            .ToListAsync();
 
-    await _db.SaveChangesAsync();
-}
+        foreach (var child in children)
+        {
+            child.IsActive = child.Id == childId;
+        }
+
+        await _db.SaveChangesAsync();
+    }
 }

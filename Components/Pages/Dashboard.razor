@@ -8,9 +8,6 @@
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
-
-
-@using ToddlerActivityPlanner.Models
 @inject ToddlerActivityPlanner.Services.ActivityService ActivityService
 @inject ToddlerActivityPlanner.Services.MealService MealService
 @inject ToddlerActivityPlanner.Services.SleepService SleepService
@@ -90,42 +87,53 @@ else
     private int SleepCount;
     private int WaterCups;
     private Child? activeChild;
-
     private string displayName = "Parent";
-
     private GrowthRecord? LatestGrowth;
 
     protected override async Task OnInitializedAsync()
-{
-    var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-    var user = authState.User;
-
-    if (user.Identity?.IsAuthenticated == true)
     {
-        var appUser = await UserManager.GetUserAsync(user);
-        if (appUser != null)
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
         {
-            displayName = appUser.ParentName;
+            var appUser = await UserManager.GetUserAsync(user);
+
+            if (appUser != null)
+            {
+                displayName = appUser.ParentName;
+            }
         }
-    }
-    activeChild = (await ChildService.GetAllAsync())
-                    .FirstOrDefault(c => c.IsActive);
 
-    LatestGrowth = activeChild == null
-    ? null
-    : (await GrowthService.GetAllAsync(activeChild.Id)).FirstOrDefault();
+        var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-    ActivityCount = activeChild == null
-    ? 0
-    : (await ActivityService.GetAllAsync(activeChild.Id)).Count;
-    MealCount = activeChild == null
-    ? 0
-    : (await MealService.GetAllAsync(activeChild.Id)).Count;
-   SleepCount = activeChild == null
-    ? 0
-    : (await SleepService.GetAllAsync(activeChild.Id)).Count;
-   WaterCups = activeChild == null
-    ? 0
-    : (await WaterService.GetAllAsync(activeChild.Id)).Sum(x => x.CupsDrank);
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            activeChild = null;
+            return;
+        }
+
+        activeChild = (await ChildService.GetAllAsync(userId))
+            .FirstOrDefault(c => c.IsActive);
+
+        LatestGrowth = activeChild == null
+            ? null
+            : (await GrowthService.GetAllAsync(activeChild.Id)).FirstOrDefault();
+
+        ActivityCount = activeChild == null
+            ? 0
+            : (await ActivityService.GetAllAsync(activeChild.Id)).Count;
+
+        MealCount = activeChild == null
+            ? 0
+            : (await MealService.GetAllAsync(activeChild.Id)).Count;
+
+        SleepCount = activeChild == null
+            ? 0
+            : (await SleepService.GetAllAsync(activeChild.Id)).Count;
+
+        WaterCups = activeChild == null
+            ? 0
+            : (await WaterService.GetAllAsync(activeChild.Id)).Sum(x => x.CupsDrank);
     }
 }

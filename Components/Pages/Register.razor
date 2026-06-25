@@ -11,7 +11,7 @@
 <input class="form-control" @bind="parentName" placeholder="Parent Name" />
 <br />
 
-<input class="form-control" @bind="phoneNumber" placeholder="Phone Number" />
+<input class="form-control" @bind="phoneNumber" placeholder="Phone Number with country code, e.g. +971501234567" />
 <br />
 
 <input class="form-control" @bind="email" placeholder="Email" />
@@ -43,6 +43,24 @@
             ParentName = parentName,
             PhoneNumber = phoneNumber
         };
+
+        if (string.IsNullOrWhiteSpace(parentName))
+{
+    message = "Please enter parent name.";
+    return;
+}
+
+if (string.IsNullOrWhiteSpace(phoneNumber))
+{
+    message = "Please enter phone number with country code.";
+    return;
+}
+
+if (!phoneNumber.StartsWith("+"))
+{
+    message = "Please include country code, example +971501234567.";
+    return;
+}
 
         var result = await UserManager.CreateAsync(user, password);
 
