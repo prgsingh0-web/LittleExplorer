@@ -5,6 +5,8 @@
 @inject ToddlerActivityPlanner.Services.WaterService WaterService
 
 @inject ToddlerActivityPlanner.Services.ChildService ChildService
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 
 <div class="dashboard-card water-card">
@@ -42,42 +44,47 @@
     private int ProgressPercent => TotalCups >= 5 ? 100 : TotalCups * 100 / 5;
 
     protected override async Task OnInitializedAsync()
-{
-    activeChild = (await ChildService.GetAllAsync())
-        .FirstOrDefault(c => c.IsActive);
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-    await LoadWaterRecords();
-}
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            activeChild = null;
+            return;
+        }
+
+        activeChild = (await ChildService.GetAllAsync(userId))
+            .FirstOrDefault(c => c.IsActive);
+
+        await LoadWaterRecords();
+    }
 
     private async Task AddWater()
-    {   
+    {
         if (activeChild == null)
-{
-    return;
-}
+        {
+            return;
+        }
 
-await WaterService.AddAsync(new WaterRecord
-{
-    CupsDrank = cups,
-    ChildId = activeChild.Id,
-    Date = DateTime.Today
-});
         await WaterService.AddAsync(new WaterRecord
         {
             CupsDrank = cups,
+            ChildId = activeChild.Id,
             Date = DateTime.Today
         });
 
         await LoadWaterRecords();
     }
-    private async Task LoadWaterRecords()
-{
-    if (activeChild == null)
-    {
-        records = new();
-        return;
-    }
 
-    records = await WaterService.GetAllAsync(activeChild.Id);
-}
+    private async Task LoadWaterRecords()
+    {
+        if (activeChild == null)
+        {
+            records = new();
+            return;
+        }
+
+        records = await WaterService.GetAllAsync(activeChild.Id);
+    }
 }

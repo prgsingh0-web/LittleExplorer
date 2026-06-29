@@ -4,6 +4,8 @@
 @using ToddlerActivityPlanner.Models
 @inject ToddlerActivityPlanner.Services.GrowthService GrowthService
 @inject ToddlerActivityPlanner.Services.ChildService ChildService
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="dashboard-card growth-form-card">
     <h3>📈 Add Growth Record</h3>
@@ -93,8 +95,17 @@ else
     private decimal heightChange;
     protected override async Task OnInitializedAsync()
     {
-        activeChild = (await ChildService.GetAllAsync())
-            .FirstOrDefault(c => c.IsActive);
+       var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+var userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+if (string.IsNullOrWhiteSpace(userId))
+{
+    activeChild = null;
+    return;
+}
+
+activeChild = (await ChildService.GetAllAsync(userId))
+    .FirstOrDefault(c => c.IsActive);
 
         await LoadGrowthRecords();
     }

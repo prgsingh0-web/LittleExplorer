@@ -5,6 +5,8 @@
 @using Microsoft.AspNetCore.Components.Forms
 @inject ToddlerActivityPlanner.Services.MemoryService MemoryService
 @inject ToddlerActivityPlanner.Services.ChildService ChildService
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <h1>📸 Memory Gallery</h1>
 
@@ -68,13 +70,21 @@ else
     private Memory newMemory = new();
 
     protected override async Task OnInitializedAsync()
-    {
-        activeChild = (await ChildService.GetAllAsync())
-            .FirstOrDefault(c => c.IsActive);
+{
+    var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    var userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-        await LoadMemories();
+    if (string.IsNullOrWhiteSpace(userId))
+    {
+        activeChild = null;
+        return;
     }
 
+    activeChild = (await ChildService.GetAllAsync(userId))
+        .FirstOrDefault(c => c.IsActive);
+
+    await LoadMemories();
+}
     private async Task LoadMemories()
     {
         if (activeChild == null)

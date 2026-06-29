@@ -5,6 +5,8 @@
 @inject ToddlerActivityPlanner.Services.SleepService SleepService
 
 @inject ToddlerActivityPlanner.Services.ChildService ChildService
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="alert alert-info">
     👶 Tracking for: <strong>@activeChild?.Name</strong>
@@ -58,8 +60,17 @@
     };
 protected override async Task OnInitializedAsync()
 {
-    activeChild = (await ChildService.GetAllAsync())
-        .FirstOrDefault(c => c.IsActive);
+   var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+var userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+if (string.IsNullOrWhiteSpace(userId))
+{
+    activeChild = null;
+    return;
+}
+
+activeChild = (await ChildService.GetAllAsync(userId))
+    .FirstOrDefault(c => c.IsActive);
 
     await LoadSleepRecords();
 }
