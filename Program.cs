@@ -38,6 +38,7 @@ builder.Services.AddScoped<WaterService>();
 builder.Services.AddScoped<ChildService>();
 builder.Services.AddScoped<MemoryService>();
 builder.Services.AddScoped<GrowthService>();
+builder.Services.AddScoped<MilestoneService>();
 
 var app = builder.Build();
 

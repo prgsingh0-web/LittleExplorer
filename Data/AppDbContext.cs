@@ -19,4 +19,5 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Child> Children => Set<Child>();
     public DbSet<Memory> Memories => Set<Memory>();
     public DbSet<GrowthRecord> GrowthRecords => Set<GrowthRecord>();
+    public DbSet<Milestone> Milestones { get; set; }
 }

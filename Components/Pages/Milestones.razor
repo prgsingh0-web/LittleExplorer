@@ -1,0 +1,285 @@
+@page "/milestones"
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using ToddlerActivityPlanner.Models
+@using ToddlerActivityPlanner.Services
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ChildService ChildService
+@inject MilestoneService MilestoneService
+
+<h1 class="mb-4">🏆 Development Journey</h1>
+
+@if (activeChild == null)
+{
+    <div class="alert alert-warning">
+        Please select an active child first.
+    </div>
+}
+else
+{
+    <div class="dashboard-card mb-4">
+
+        <h3>👶 @activeChild.Name</h3>
+
+        <h5 class="mt-3">
+            @CompletedCount / @TotalCount Milestones Completed
+        </h5>
+
+        <div class="progress mt-2" style="height:25px;">
+            <div class="progress-bar bg-success"
+                 style="width:@ProgressPercent%">
+                @ProgressPercent%
+            </div>
+        </div>
+
+    </div>
+
+    @foreach (var group in milestones.GroupBy(x => x.Category))
+    {
+        var completed = group.Count(x => x.IsCompleted);
+        var total = group.Count();
+
+        <div class="dashboard-card mb-4">
+
+            <h3>
+                @GetCategoryIcon(group.Key)
+                @group.Key
+            </h3>
+
+            <small>
+                @completed / @total completed
+            </small>
+
+            <hr />
+
+            @foreach (var milestone in group)
+            {
+                <div class="card mb-3">
+
+                    <div class="card-body">
+
+                        <div class="d-flex justify-content-between">
+
+                            <div>
+
+                                <h5>@milestone.Title</h5>
+
+                                <small class="text-muted">
+                                    @milestone.AgeRange
+                                </small>
+
+                            </div>
+
+                            <div>
+
+                                @if (milestone.IsCompleted)
+                                {
+                                    <span class="badge bg-success">
+                                        ✅ Completed
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">
+                                        Pending
+                                    </span>
+                                }
+
+                            </div>
+
+                        </div>
+
+                        @if (milestone.DateCompleted != null)
+                        {
+                            <small class="text-success">
+                                Completed on
+                                @milestone.DateCompleted?.ToString("dd MMM yyyy")
+                            </small>
+
+                            <br />
+                        }
+
+                        <div class="mt-3">
+
+                            <button class="btn btn-success btn-sm me-2"
+                                    @onclick="() => Toggle(milestone.Id)">
+                                Toggle
+                            </button>
+
+                            <button class="btn btn-danger btn-sm"
+                                    @onclick="() => Delete(milestone.Id)">
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+    <hr />
+
+    <div class="dashboard-card">
+
+        <h3>➕ Add Milestone</h3>
+
+        <label>Category</label>
+
+        <select class="form-control"
+                @bind="selectedCategory">
+            <option>Language</option>
+            <option>Motor Skills</option>
+            <option>Cognitive</option>
+            <option>Social</option>
+            <option>Emotional</option>
+        </select>
+
+        <br />
+
+        <label>Available Milestones</label>
+
+        <select class="form-control"
+                @bind="selectedTitle">
+
+            @foreach (var item in AvailableTitles)
+            {
+                <option value="@item">
+                    @item
+                </option>
+            }
+
+        </select>
+
+        <br />
+
+        <button class="btn btn-primary"
+                @onclick="AddMilestone">
+            Add Selected Milestone
+        </button>
+
+    </div>
+}
+@code {
+
+    private Child? activeChild;
+
+    private List<Milestone> milestones = new();
+
+    private string selectedCategory = "Language";
+
+    private string selectedTitle = "";
+
+    private int TotalCount => milestones.Count;
+
+    private int CompletedCount => milestones.Count(x => x.IsCompleted);
+
+    private int ProgressPercent =>
+        TotalCount == 0 ? 0 : CompletedCount * 100 / TotalCount;
+
+    private List<string> AvailableTitles =>
+        MilestoneLibrary
+            .GetAllMilestones()
+            .Where(x => x.Category == selectedCategory)
+            .Select(x => x.Title)
+            .Distinct()
+            .OrderBy(x => x)
+            .ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState =
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        var userId = authState.User
+            .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
+            ?.Value;
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+        activeChild = (await ChildService.GetAllAsync(userId))
+            .FirstOrDefault(c => c.IsActive);
+
+        await LoadMilestones();
+
+        if (AvailableTitles.Any())
+            selectedTitle = AvailableTitles.First();
+    }
+
+    private async Task LoadMilestones()
+    {
+        if (activeChild == null)
+        {
+            milestones = new();
+            return;
+        }
+
+        milestones = await MilestoneService.GetAllAsync(activeChild.Id);
+    }
+
+    private async Task AddMilestone()
+    {
+        if (activeChild == null)
+            return;
+
+        if (string.IsNullOrWhiteSpace(selectedTitle))
+            return;
+
+        var exists = milestones.Any(x =>
+            x.Title == selectedTitle);
+
+        if (exists)
+            return;
+
+        var template = MilestoneLibrary
+            .GetAllMilestones()
+            .First(x =>
+                x.Title == selectedTitle &&
+                x.Category == selectedCategory);
+
+        await MilestoneService.AddAsync(new Milestone
+        {
+            ChildId = activeChild.Id,
+            Title = template.Title,
+            Category = template.Category,
+            AgeRange = template.AgeRange
+        });
+
+        await LoadMilestones();
+    }
+
+    private async Task Toggle(int id)
+    {
+        await MilestoneService.ToggleCompletedAsync(id);
+        await LoadMilestones();
+    }
+
+    private async Task Delete(int id)
+    {
+        await MilestoneService.DeleteAsync(id);
+        await LoadMilestones();
+    }
+
+    private string GetCategoryIcon(string category)
+    {
+        return category switch
+        {
+            "Language" => "🗣️",
+            "Motor Skills" => "🏃",
+            "Cognitive" => "🧠",
+            "Social" => "🤝",
+            "Emotional" => "❤️",
+            _ => "⭐"
+        };
+    }
+}

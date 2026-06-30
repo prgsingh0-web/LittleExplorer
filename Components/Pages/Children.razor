@@ -8,6 +8,7 @@
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ToddlerActivityPlanner.Services.ChildService ChildService
+@inject ToddlerActivityPlanner.Services.MilestoneService MilestoneService
 
 <h1>👶 Child Profile</h1>
 
@@ -95,6 +96,7 @@
         newChild.UserId = userId;
 
         await ChildService.AddAsync(newChild);
+        await MilestoneService.SeedDefaultMilestonesAsync(newChild.Id, newChild.Age ?? 0);
         newChild = new Child();
         await LoadChildren();
     }
