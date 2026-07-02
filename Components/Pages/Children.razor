@@ -10,8 +10,11 @@
 @inject ToddlerActivityPlanner.Services.ChildService ChildService
 @inject ToddlerActivityPlanner.Services.MilestoneService MilestoneService
 
-<h1>👶 Child Profile</h1>
 
+<h1>👶 My Child</h1>
+<p class="page-subtitle">Manage your child profile and active child.</p>
+
+<div class="child-form-card">
 <label>Child Name</label>
 <input class="form-control" @bind="newChild.Name" placeholder="Enter child name" />
 
@@ -30,18 +33,27 @@
 <button class="btn btn-primary" @onclick="AddChild">
     Add Child
 </button>
-
+</div>
 <hr />
 
 @foreach (var child in children)
 {
-    <div class="dashboard-card">
+    <div class="child-profile-card">
         <h3>👶 @child.Name</h3>
-        <p>Age: @child.Age years</p>
+        <span class="child-age-badge">Age: @child.Age years</span>
 
         @if (child.IsActive)
         {
             <span class="badge bg-success">⭐ Active Child</span>
+            <div class="mt-3">
+    <strong>🏆 Development Score</strong>
+    <div class="progress mt-2">
+        <div class="progress-bar bg-success"
+             style="width:@childScores.GetValueOrDefault(child.Id, 0)%">
+            @childScores.GetValueOrDefault(child.Id, 0)%
+        </div>
+    </div>
+</div>
         }
         else
         {
@@ -57,11 +69,11 @@
         </button>
     </div>
 }
-
 @code {
     private List<Child> children = new();
     private Child newChild = new();
     private string errorMessage = "";
+    private Dictionary<int, int> childScores = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -112,6 +124,16 @@
     }
 
     children = await ChildService.GetAllAsync(userId);
+    childScores.Clear();
+
+foreach (var child in children)
+{
+    var milestones = await MilestoneService.GetAllAsync(child.Id);
+    var total = milestones.Count;
+    var completed = milestones.Count(x => x.IsCompleted);
+
+    childScores[child.Id] = total == 0 ? 0 : completed * 100 / total;
+}
     }
 
     private async Task DeleteChild(int id)

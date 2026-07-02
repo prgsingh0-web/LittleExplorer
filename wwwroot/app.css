@@ -983,3 +983,214 @@ h1:focus {
     font-weight:800;
 }
 
+
+/* ===== DEVELOPMENT JOURNEY V3 ===== */
+
+.page-subtitle {
+    color: #6b7280;
+    font-size: 18px;
+    margin-top: -12px;
+    margin-bottom: 24px;
+}
+
+.milestone-card {
+    border: none !important;
+    border-radius: 18px !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,.06);
+    background: #ffffff;
+}
+
+.milestone-card h5 {
+    font-weight: 800;
+    color: #1f2937;
+}
+
+.dashboard-card h3 {
+    font-weight: 800;
+}
+
+.badge {
+    border-radius: 999px;
+    padding: 8px 12px;
+}
+
+.progress {
+    height: 18px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+
+/* ===== MY CHILD V3 ===== */
+
+.child-profile-card {
+    background: linear-gradient(135deg,#fff7ed,#fce7f3,#e0e7ff);
+    border-radius: 26px;
+    padding: 28px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.08);
+    margin-bottom: 20px;
+}
+
+.child-profile-card h3 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1f2937;
+}
+
+.child-age-badge {
+    display: inline-block;
+    background: white;
+    color: #7c3aed;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-weight: 700;
+    margin-top: 6px;
+}
+
+.child-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.child-form-card {
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 24px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.06);
+    margin-bottom: 25px;
+}
+
+
+.achievement-soft{
+    background:#EFF6FF;
+}
+
+.achievement-soft strong{
+    color:#1E3A8A;
+}
+
+
+/* ===== DASHBOARD MINI CARDS ===== */
+
+.mini-card {
+    text-align: center;
+    min-height: 145px;
+}
+
+.mini-card h2 {
+    font-size: 38px;
+    font-weight: 800;
+    color: #4f46e5;
+}
+
+.mini-card h5 {
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.mini-card small {
+    color: #6b7280;
+}
+
+
+.sub-link {
+    font-size: 14px !important;
+    margin-left: 22px !important;
+    opacity: 0.88;
+    padding: 8px 14px !important;
+}
+
+
+/* ===== GROWTH CHART V3 ===== */
+
+.growth-chart-card {
+    margin-bottom: 25px;
+}
+
+.growth-chart {
+    height: 220px;
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+    padding: 20px 10px 5px 10px;
+    border-radius: 20px;
+    background: #f8fafc;
+}
+
+.growth-bar-wrap {
+    flex: 1;
+    text-align: center;
+}
+
+.growth-bar {
+    width: 100%;
+    max-width: 45px;
+    margin: 0 auto 10px auto;
+    border-radius: 14px 14px 4px 4px;
+    background: linear-gradient(180deg, #86efac, #22c55e);
+}
+
+.growth-bar-wrap small {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+
+/* ===== FIX GROWTH CHART BARS ===== */
+
+.growth-chart {
+    height: 260px !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: space-around !important;
+    gap: 24px !important;
+    padding: 30px 25px 15px 25px !important;
+    background: #f8fafc !important;
+}
+
+.growth-bar-wrap {
+    height: 220px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    flex: 1 !important;
+}
+
+.growth-bar {
+    width: 42px !important;
+    min-height: 20px !important;
+    border-radius: 14px 14px 4px 4px !important;
+    background: linear-gradient(180deg, #34d399, #059669) !important;
+    box-shadow: 0 8px 16px rgba(5,150,105,.25) !important;
+}
+
+.growth-bar-wrap small {
+    margin-top: 10px !important;
+    font-size: 12px !important;
+    color: #4b5563 !important;
+}
+
+
+.growth-trend-list {
+    display: grid;
+    gap: 12px;
+}
+
+.growth-trend-item {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-weight: 600;
+}
+

@@ -49,7 +49,23 @@ else
     </button>
 
     <hr />
+@if (growthRecords.Any())
+{
+    <div class="dashboard-card growth-chart-card">
+        <h3>📈 Growth Trend</h3>
 
+        <div class="growth-trend-list">
+            @foreach (var record in ChartRecords)
+            {
+                <div class="growth-trend-item">
+                    <strong>@record.RecordDate.ToString("dd MMM")</strong>
+                    <span>⚖️ @record.WeightKg kg</span>
+                    <span>📏 @record.HeightCm cm</span>
+                </div>
+            }
+        </div>
+    </div>
+}
   @if (latestRecord != null)
 {
     <div class="dashboard-card growth-summary-card">
@@ -149,6 +165,23 @@ activeChild = (await ChildService.GetAllAsync(userId))
         newRecord = new GrowthRecord();
         await LoadGrowthRecords();
     }
+
+    private List<GrowthRecord> ChartRecords =>
+    growthRecords
+        .OrderBy(x => x.RecordDate)
+        .TakeLast(6)
+        .ToList();
+
+private decimal MaxWeight =>
+    ChartRecords.Any() ? ChartRecords.Max(x => x.WeightKg) : 1;
+
+private int GetWeightBarHeight(decimal weight)
+{
+    if (MaxWeight <= 0) return 10;
+
+    var percent = (int)((weight / MaxWeight) * 100);
+    return Math.Max(percent, 15);
+}
 
     private async Task Delete(int id)
     {

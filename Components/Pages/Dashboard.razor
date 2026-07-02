@@ -12,6 +12,10 @@
 @inject ToddlerActivityPlanner.Services.ChildService ChildService
 @inject ToddlerActivityPlanner.Services.GrowthService GrowthService
 @inject ToddlerActivityPlanner.Services.MilestoneService MilestoneService
+@inject ToddlerActivityPlanner.Services.ActivityService ActivityService
+@inject ToddlerActivityPlanner.Services.MealService MealService
+@inject ToddlerActivityPlanner.Services.SleepService SleepService
+@inject ToddlerActivityPlanner.Services.WaterService WaterService
 
 <div class="v3-dashboard">
 
@@ -85,11 +89,81 @@
                 <a class="btn btn-outline-primary btn-sm" href="/ai-assistant">Ask AI Coach</a>
             </div>
 
+            <div class="v3-card achievement-soft">
+
+    <h3>🏆 Recent Achievements</h3>
+
+    @if (RecentAchievements.Any())
+    {
+        @foreach (var item in RecentAchievements)
+        {
+            <div class="mb-3">
+
+                <strong>✅ @item.Title</strong>
+
+                <br />
+
+                <small class="text-muted">
+                    @item.DateCompleted?.ToString("dd MMM yyyy")
+                </small>
+
+            </div>
+        }
+    }
+    else
+    {
+        <p>No milestones completed yet.</p>
+    }
+
+    <hr />
+
+    <h5>🎯 Next Milestone</h5>
+
+    @if (NextMilestone != null)
+    {
+        <strong>@NextMilestone.Title</strong>
+
+        <br />
+
+        <small>@NextMilestone.AgeRange</small>
+    }
+    else
+    {
+        <span class="text-success">
+            🎉 All milestones completed!
+        </span>
+    }
+
+</div>
+
             <div class="v3-card memory-soft">
                 <h3>📸 Memories</h3>
                 <p>Capture your child's special moments and milestones.</p>
                 <a class="btn btn-outline-primary btn-sm" href="/memories">Open Memories</a>
             </div>
+            <div class="v3-card mini-card">
+    <h5>🍽 Meals</h5>
+    <h2>@MealCount</h2>
+    <small>Meals logged</small>
+</div>
+
+<div class="v3-card mini-card">
+    <h5>💧 Water</h5>
+    <h2>@WaterCups</h2>
+    <small>Cups today</small>
+</div>
+
+<div class="v3-card mini-card">
+    <h5>😴 Sleep</h5>
+    <h2>@SleepCount</h2>
+    <small>Sleep records</small>
+</div>
+
+<div class="v3-card mini-card">
+    <h5>🎯 Activities</h5>
+    <h2>@ActivityCount</h2>
+    <small>Activities logged</small>
+</div>
         </div>
     }
 </div>
@@ -98,10 +172,16 @@
     private Child? activeChild;
     private string displayName = "Parent";
     private GrowthRecord? LatestGrowth;
-
     private int TotalMilestones;
     private int CompletedMilestones;
 
+    private int ActivityCount;
+    private int MealCount;
+    private int SleepCount;
+    private int WaterCups;  
+
+    private List<Milestone> RecentAchievements = new();
+    private Milestone? NextMilestone;
     private int DevelopmentScore =>
         TotalMilestones == 0 ? 0 : CompletedMilestones * 100 / TotalMilestones;
 
@@ -143,9 +223,23 @@
 
         LatestGrowth = (await GrowthService.GetAllAsync(activeChild.Id))
             .FirstOrDefault();
+        ActivityCount = (await ActivityService.GetAllAsync(activeChild.Id)).Count;
+        MealCount = (await MealService.GetAllAsync(activeChild.Id)).Count;
+        SleepCount = (await SleepService.GetAllAsync(activeChild.Id)).Count;
+        WaterCups = (await WaterService.GetAllAsync(activeChild.Id)).Sum(x => x.CupsDrank);
 
-        var milestones = await MilestoneService.GetAllAsync(activeChild.Id);
-        TotalMilestones = milestones.Count;
-        CompletedMilestones = milestones.Count(x => x.IsCompleted);
+       var milestones = await MilestoneService.GetAllAsync(activeChild.Id);
+
+       TotalMilestones = milestones.Count;
+       CompletedMilestones = milestones.Count(x => x.IsCompleted);
+
+       RecentAchievements = milestones
+    .Where(x => x.IsCompleted)
+    .OrderByDescending(x => x.DateCompleted)
+    .Take(3)
+    .ToList();
+
+        NextMilestone = milestones
+       .FirstOrDefault(x => !x.IsCompleted);
     }
 }
