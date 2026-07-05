@@ -58,10 +58,15 @@
         else
         {
             <button class="btn btn-outline-primary btn-sm"
-                    @onclick="() => SetActive(child.Id)">
-                Select
-            </button>
+                @onclick="() => SetActive(child.Id)">
+            Select
+        </button>
         }
+
+    <a class="btn btn-primary btn-sm"
+   href="/child-profile/@child.Id">
+    👶 View Profile
+</a>
 
         <button class="btn btn-danger btn-sm"
                 @onclick="() => DeleteChild(child.Id)">

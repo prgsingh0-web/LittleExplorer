@@ -1,0 +1,206 @@
+@page "/child-profile/{ChildId:int}"
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using ToddlerActivityPlanner.Models
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ToddlerActivityPlanner.Services.ChildService ChildService
+@inject ToddlerActivityPlanner.Services.GrowthService GrowthService
+@inject ToddlerActivityPlanner.Services.MilestoneService MilestoneService
+@inject ToddlerActivityPlanner.Services.MemoryService MemoryService
+
+<h1>👶 My Child Profile</h1>
+<a class="btn btn-secondary mb-4"
+   href="/children">
+    ← Back to My Children
+</a>
+
+@if (activeChild == null)
+{
+    <div class="alert alert-warning">
+        No active child selected.
+    </div>
+}
+else
+{
+   <div class="child-profile-card">
+
+    <h2>👶 @activeChild.Name</h2>
+
+    <span class="child-age-badge">
+        @activeChild.Age years old
+    </span>
+
+    <hr />
+
+    <div class="row">
+
+       <div class="col-md-3 mb-3">
+    <div class="child-stat">
+            <h5>🏆 Development</h5>
+            <h2>@developmentScore%</h2>
+        </div>
+        </div>
+</div>
+
+       <div class="col-md-3 mb-3">
+    <div class="child-stat">
+            <h5>⚖️ Weight</h5>
+
+            @if(latestGrowth != null)
+            {
+                <h2>@latestGrowth.WeightKg kg</h2>
+            }
+            else
+            {
+                <h2>-</h2>
+            }
+
+        </div>
+        </div>
+</div>
+
+       <div class="col-md-3 mb-3">
+    <div class="child-stat">
+            <h5>📏 Height</h5>
+
+            @if(latestGrowth != null)
+            {
+                <h2>@latestGrowth.HeightCm cm</h2>
+            }
+            else
+            {
+                <h2>-</h2>
+            }
+
+        </div>
+        </div>
+
+
+         <div class="col-md-3 mb-3">
+    <div class="child-stat">
+            <h5>🤖 AI Coach</h5>
+            <div class="ai-tip-box">
+    @aiTip
+</div>
+        </div>
+
+    </div>
+
+
+    @if(latestMemory != null)
+    {
+        <div class="memory-box">
+
+    <h5>📸 Latest Memory</h5>
+
+    <strong>@latestMemory.Title</strong>
+
+    <br />
+
+    <small>@latestMemory.CreatedDate.ToString("dd MMM yyyy")</small>
+
+</div>
+    }
+    <hr />
+
+<h3 class="mt-4">🚀 Quick Actions</h3>
+
+<div class="row mt-3">
+
+    <div class="col-md-3 mb-3">
+        <a class="btn btn-outline-success w-100 p-3"
+           href="/growth">
+            📈 Growth
+        </a>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <a class="btn btn-outline-warning w-100 p-3"
+           href="/milestones">
+            🏆 Development
+        </a>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <a class="btn btn-outline-primary w-100 p-3"
+           href="/memories">
+            📸 Memories
+        </a>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <a class="btn btn-outline-dark w-100 p-3"
+           href="/ai-assistant">
+            🤖 AI Coach
+        </a>
+    </div>
+
+</div>
+}
+
+@code {
+    
+    [Parameter]
+    public int ChildId { get; set; }
+    private Child? activeChild;
+    private GrowthRecord? latestGrowth;
+    private Memory? latestMemory;
+
+    private int developmentScore;
+    private string aiTip = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        var userId = authState.User
+            .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
+            ?.Value;
+
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return;
+        }
+
+       activeChild = (await ChildService.GetAllAsync(userId))
+    .FirstOrDefault(c => c.Id == ChildId);
+
+        if (activeChild == null)
+        {
+            return;
+        }
+
+        latestGrowth = (await GrowthService.GetAllAsync(activeChild.Id))
+            .FirstOrDefault();
+
+        var milestones = await MilestoneService.GetAllAsync(activeChild.Id);
+
+        developmentScore = milestones.Count == 0
+            ? 0
+            : milestones.Count(x => x.IsCompleted) * 100 / milestones.Count;
+
+        latestMemory = (await MemoryService.GetAllAsync(activeChild.Id))
+            .FirstOrDefault();
+
+        aiTip = GetAiTip(activeChild.Age ?? 0);
+    }
+
+    private string GetAiTip(int age)
+    {
+        if (age <= 1)
+            return "Read picture books and encourage crawling, standing and simple words.";
+
+        if (age == 2)
+            return "Practice colours, shape matching and outdoor play every day.";
+
+        if (age == 3)
+            return "Encourage storytelling, counting and imaginative play.";
+
+        return "Continue reading, outdoor activities and learning through play.";
+    }
+
+}
