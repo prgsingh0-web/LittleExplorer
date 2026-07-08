@@ -50,8 +50,10 @@
 
                 <a class="btn btn-light mt-3" href="/children">View Child Profile</a>
             </div>
-
-            <img src="/images/baby.jpeg" class="v3-avatar" />
+<img src="@(string.IsNullOrWhiteSpace(activeChild?.PhotoPath)
+        ? "/images/aarav.png"
+        : activeChild.PhotoPath)"
+     class="v3-avatar" />
         </div>
 
         <div class="v3-grid">

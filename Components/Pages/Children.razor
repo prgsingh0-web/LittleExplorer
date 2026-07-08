@@ -5,6 +5,9 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using ToddlerActivityPlanner.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject IWebHostEnvironment Environment
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ToddlerActivityPlanner.Services.ChildService ChildService
@@ -29,6 +32,40 @@
 {
     <div class="alert alert-danger">@errorMessage</div>
 }
+<label class="mt-3"><strong>Choose Avatar</strong></label>
+
+<div class="d-flex flex-wrap gap-3 mt-2">
+
+@for (int i = 1; i <= 8; i++)
+{
+    var avatar = $"/images/avatars/avatar{i}.png";
+
+    <img src="@avatar"
+         style="
+            width:70px;
+            height:70px;
+            cursor:pointer;
+            border-radius:50%;
+            object-fit:cover;
+            border:@(newChild.PhotoPath == avatar ? "3px solid #4f46e5" : "2px solid #ddd");"
+         @onclick="@(() => SelectAvatar(avatar))" />
+}
+
+</div>
+
+<br />
+
+<div class="text-center">
+
+    <p><strong>Selected Photo</strong></p>
+
+    <img src="@newChild.PhotoPath"
+         style="width:120px;height:120px;border-radius:50%;object-fit:cover;" />
+
+</div>
+
+<br />
+<br />
 
 <button class="btn btn-primary" @onclick="AddChild">
     Add Child
@@ -38,6 +75,11 @@
 
 @foreach (var child in children)
 {
+    <img src="@(string.IsNullOrWhiteSpace(child.PhotoPath)
+            ? "/images/aarav.png"
+            : child.PhotoPath)"
+     class="rounded-circle shadow mb-3"
+     style="width:90px;height:90px;object-fit:cover;" />
     <div class="child-profile-card">
         <h3>👶 @child.Name</h3>
         <span class="child-age-badge">Age: @child.Age years</span>
@@ -76,7 +118,10 @@
 }
 @code {
     private List<Child> children = new();
-    private Child newChild = new();
+   private Child newChild = new()
+{
+    PhotoPath = "/images/aarav.png"
+};
     private string errorMessage = "";
     private Dictionary<int, int> childScores = new();
 
@@ -160,5 +205,9 @@ foreach (var child in children)
 
     await ChildService.SetActiveAsync(id, userId);
     await LoadChildren();
+}
+private void SelectAvatar(string avatar)
+{
+    newChild.PhotoPath = avatar;
 }
 }
