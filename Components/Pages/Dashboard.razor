@@ -39,6 +39,7 @@
         <div class="v3-hero-card">
             <div>
                 <h2>👶 @activeChild.Name</h2>
+                <p>@activeChild.PhotoPath</p>
                 <p>@activeChild.Age years old</p>
 
                 <h4>Development Score</h4>
@@ -194,54 +195,86 @@
                 ? "Good progress. Try focusing on a few pending milestones this week."
                 : "Start with simple daily activities like reading, color games, and outdoor play.";
 
-    protected override async Task OnInitializedAsync()
+   protected override async Task OnParametersSetAsync()
+{
+    await LoadDashboard();
+}
+
+private async Task LoadDashboard()
+{
+    var authState =
+        await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+    var user = authState.User;
+
+    if (user.Identity?.IsAuthenticated == true)
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
+        var appUser = await UserManager.GetUserAsync(user);
 
-        if (user.Identity?.IsAuthenticated == true)
+        if (appUser != null)
         {
-            var appUser = await UserManager.GetUserAsync(user);
-            if (appUser != null)
-            {
-                displayName = appUser.ParentName;
-            }
+            displayName = appUser.ParentName;
         }
-
-        var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return;
-        }
-
-        activeChild = (await ChildService.GetAllAsync(userId))
-            .FirstOrDefault(c => c.IsActive);
-
-        if (activeChild == null)
-        {
-            return;
-        }
-
-        LatestGrowth = (await GrowthService.GetAllAsync(activeChild.Id))
-            .FirstOrDefault();
-        ActivityCount = (await ActivityService.GetAllAsync(activeChild.Id)).Count;
-        MealCount = (await MealService.GetAllAsync(activeChild.Id)).Count;
-        SleepCount = (await SleepService.GetAllAsync(activeChild.Id)).Count;
-        WaterCups = (await WaterService.GetAllAsync(activeChild.Id)).Sum(x => x.CupsDrank);
-
-       var milestones = await MilestoneService.GetAllAsync(activeChild.Id);
-
-       TotalMilestones = milestones.Count;
-       CompletedMilestones = milestones.Count(x => x.IsCompleted);
-
-       RecentAchievements = milestones
-    .Where(x => x.IsCompleted)
-    .OrderByDescending(x => x.DateCompleted)
-    .Take(3)
-    .ToList();
-
-        NextMilestone = milestones
-       .FirstOrDefault(x => !x.IsCompleted);
     }
+
+    var userId = user
+        .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)
+        ?.Value;
+
+    if (string.IsNullOrWhiteSpace(userId))
+    {
+        activeChild = null;
+        return;
+    }
+
+    activeChild = (await ChildService.GetAllAsync(userId))
+        .FirstOrDefault(c => c.IsActive);
+
+    if (activeChild == null)
+    {
+        LatestGrowth = null;
+        ActivityCount = 0;
+        MealCount = 0;
+        SleepCount = 0;
+        WaterCups = 0;
+        TotalMilestones = 0;
+        CompletedMilestones = 0;
+        RecentAchievements = new();
+        NextMilestone = null;
+        return;
+    }
+
+    LatestGrowth = (await GrowthService.GetAllAsync(activeChild.Id))
+        .FirstOrDefault();
+
+    ActivityCount =
+        (await ActivityService.GetAllAsync(activeChild.Id)).Count;
+
+    MealCount =
+        (await MealService.GetAllAsync(activeChild.Id)).Count;
+
+    SleepCount =
+        (await SleepService.GetAllAsync(activeChild.Id)).Count;
+
+    WaterCups =
+        (await WaterService.GetAllAsync(activeChild.Id))
+        .Sum(x => x.CupsDrank);
+
+    var milestones =
+        await MilestoneService.GetAllAsync(activeChild.Id);
+
+    TotalMilestones = milestones.Count;
+
+    CompletedMilestones =
+        milestones.Count(x => x.IsCompleted);
+
+    RecentAchievements = milestones
+        .Where(x => x.IsCompleted)
+        .OrderByDescending(x => x.DateCompleted)
+        .Take(3)
+        .ToList();
+
+    NextMilestone =
+        milestones.FirstOrDefault(x => !x.IsCompleted);
+}
 }
