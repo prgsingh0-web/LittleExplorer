@@ -75,11 +75,20 @@
 
 @foreach (var child in children)
 {
-    <img src="@(string.IsNullOrWhiteSpace(child.PhotoPath)
-            ? "/images/aarav.png"
-            : child.PhotoPath)"
-     class="rounded-circle shadow mb-3"
-     style="width:90px;height:90px;object-fit:cover;" />
+    @if (!string.IsNullOrWhiteSpace(newChild.PhotoPath))
+{
+    <div class="text-center mt-3">
+
+        <p><strong>Selected Avatar</strong></p>
+
+        <img src="@newChild.PhotoPath"
+             style="width:120px;
+                    height:120px;
+                    border-radius:50%;
+                    object-fit:cover;" />
+
+    </div>
+}
     <div class="child-profile-card">
         <h3>👶 @child.Name</h3>
         <span class="child-age-badge">Age: @child.Age years</span>
