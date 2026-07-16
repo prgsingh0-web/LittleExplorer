@@ -8,19 +8,30 @@
 
 <h1>📝 Register Parent</h1>
 
-<input class="form-control" @bind="parentName" placeholder="Parent Name" />
+<input class="form-control"
+       @bind="parentName"
+       placeholder="Parent Name"
+       autocomplete="name" />
 <br />
 
-<input class="form-control" @bind="phoneNumber" placeholder="Phone Number with country code, e.g. +971501234567" />
+<input class="form-control"
+       @bind="phoneNumber"
+       placeholder="Phone Number with country code, e.g. +971501234567"
+       autocomplete="tel" />
 <br />
 
-<input class="form-control" @bind="email" placeholder="Email" />
+<input class="form-control"
+       @bind="email"
+       placeholder="Email"
+       autocomplete="off" />
 <br />
 
-<input class="form-control" type="password" @bind="password" placeholder="Password" />
+<input class="form-control"
+       type="password"
+       @bind="password"
+       placeholder="Password"
+       autocomplete="new-password" />
 <br />
-
-<button class="btn btn-primary" @onclick="RegisterUser">Register</button>
 
 @if (!string.IsNullOrWhiteSpace(message))
 {
